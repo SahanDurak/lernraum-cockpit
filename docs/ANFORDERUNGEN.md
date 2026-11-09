@@ -38,7 +38,7 @@ Priorität: **M** = Muss (MVP) · **S** = Soll · **K** = Kann (später)
 | 3.4 | Lernplan bis zu einem Prüfungstermin erstellen lassen | K |
 | 3.5 | Lernzettel / Quizfragen aus Unterlagen erzeugen | K |
 | 3.6 | Semantische Suche über alle Unterlagen (pgvector) | K |
-| 3.7 | Automatische Zusammenfassung neuer Dateien im Hintergrund (Claude-API, Budget-Limit) | K |
+| 3.7 | Automatische Zusammenfassung neuer Dateien im Hintergrund (über die LLM-Schicht, Anbieter austauschbar, Budget-Limit) | K |
 
 ## 4. Benachrichtigungen und Automationen
 
@@ -56,5 +56,5 @@ Priorität: **M** = Muss (MVP) · **S** = Soll · **K** = Kann (später)
 | 5.2 | Zugangsdaten nur in `.env`, nie im Repo; Token verschlüsselt bzw. geschützt | M |
 | 5.3 | Login-Schutz für die gehostete App | M |
 | 5.4 | Demo-Modus mit Beispieldaten | S |
-| 5.5 | Automatische Tests + GitHub Actions | S |
+| 5.5 | Automatische Tests + GitHub Actions (Lint, Typen, Tests, Secret-Scan, Docker-Build) | M |
 | 5.6 | README mit Architekturdiagramm und Screenshots | M |

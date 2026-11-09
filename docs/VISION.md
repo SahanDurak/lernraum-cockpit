@@ -11,6 +11,7 @@ Ein persönliches, selbst gehostetes Cockpit, in dem ich mein ganzes Studium org
 3. **Schneller lernen.** KI-Zusammenfassungen, Lernzettel und Lernpläne direkt aus meinen Unterlagen.
 4. **Überall nutzbar.** Am PC und am Handy, als installierbare Web-App.
 5. **Portfolio-Projekt.** Sauberes, öffentlich zeigbares GitHub-Projekt, das Automatisierung, Backend, Frontend und KI-Agenten (MCP) zeigt – passend zu meiner Rolle als Software/AI Engineer und zu Master-Bewerbungen.
+6. **Harness Engineering zeigen.** Das Projekt entsteht sichtbar mit aktuellen Agent-Workflows: Subagenten, Skills, Plugins, Hooks, CI mit GitHub Actions, Claude-Review in Pull Requests, Branch Protection und später CD. Qualität wird automatisch geprüft statt nur versprochen.
 
 ## Nicht-Ziele
 
@@ -30,3 +31,4 @@ Ein persönliches, selbst gehostetes Cockpit, in dem ich mein ganzes Studium org
 - Ich öffne den Lernraum nur noch zum Abgeben.
 - Ich verpasse keine Frist und sehe neue Unterlagen am selben Tag.
 - Das Repo ist so dokumentiert, dass ein Fremder es in 10 Minuten versteht und im Demo-Modus starten kann.
+- Jede Änderung auf `main` kam über einen Pull Request mit grüner CI und Review.
