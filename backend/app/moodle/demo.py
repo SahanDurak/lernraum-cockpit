@@ -6,6 +6,7 @@ All names, files and texts are made up.
 """
 
 from datetime import UTC, datetime, timedelta
+from pathlib import PurePosixPath
 
 from app.moodle.schemas import (
     Announcement,
@@ -106,20 +107,26 @@ _ANNOUNCEMENTS: list[tuple[int, int, str, str, str, int]] = [
 ]
 
 
+_MIMETYPES = {
+    ".pdf": "application/pdf",
+    ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+}
+
+
+def _require_aware(*values: datetime) -> None:
+    if any(value.tzinfo is None for value in values):
+        raise ValueError("datetimes must be timezone-aware")
+
+
 def _file(name: str, course_id: int, module_id: int, modified: datetime) -> FileContent:
-    mimetypes = {
-        ".pdf": "application/pdf",
-        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    }
-    extension = name[name.rfind(".") :]
     return FileContent(
         type="file",
         filename=name,
         fileurl=f"{DEMO_BASE_URL}/webservice/pluginfile.php/{course_id}/{module_id}/{name}",
         filesize=100_000 + module_id * 1_000,
         timemodified=modified,
-        mimetype=mimetypes[extension],
+        mimetype=_MIMETYPES[PurePosixPath(name).suffix],
     )
 
 
@@ -127,6 +134,8 @@ class DemoMoodleClient:
     """Implements `MoodleSource` with the invented data above."""
 
     def __init__(self, now: datetime | None = None) -> None:
+        if now is not None:
+            _require_aware(now)
         self._now = now or datetime.now(UTC)
 
     def __repr__(self) -> str:
@@ -139,6 +148,7 @@ class DemoMoodleClient:
         return SiteInfo(userid=DEMO_USER_ID, fullname="Demo Studentin", release="4.5 (Demo)")
 
     def courses(self, user_id: int) -> list[Course]:
+        """All demo courses; `user_id` is ignored (there is only the one demo user)."""
         return [
             Course(id=course_id, shortname=shortname, fullname=fullname)
             for course_id, (shortname, fullname, _) in _COURSES.items()
@@ -152,6 +162,7 @@ class DemoMoodleClient:
         for position, (section_name, files) in enumerate(sections_by_name.items()):
             modules = []
             for index, name in enumerate(files):
+                # Unique ids assume at most 10 sections per course and 10 files per section.
                 module_id = course_id * 100 + position * 10 + index
                 modified = self._now - timedelta(days=7 * (len(sections_by_name) - position))
                 modules.append(
@@ -187,6 +198,7 @@ class DemoMoodleClient:
         ]
 
     def upcoming_events(self, start: datetime, end: datetime) -> list[Event]:
+        _require_aware(start, end)
         events = [
             Event(
                 id=assignment.id + 2000,

@@ -5,9 +5,17 @@ Moodle sends times as Unix timestamps; pydantic turns them into timezone-aware U
 """
 
 from datetime import datetime
-from typing import Protocol
+from typing import Annotated, Protocol
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict
+
+
+def _zero_is_none(value: object) -> object:
+    return None if value == 0 else value
+
+
+# Moodle sends 0 for "no date" (e.g. no due date, unknown modification time).
+OptionalTimestamp = Annotated[datetime | None, BeforeValidator(_zero_is_none)]
 
 
 class MoodleModel(BaseModel):
@@ -33,7 +41,7 @@ class FileContent(MoodleModel):
     filename: str
     fileurl: str = ""
     filesize: int = 0
-    timemodified: datetime | None = None
+    timemodified: OptionalTimestamp = None
     mimetype: str = ""
 
 
@@ -57,12 +65,7 @@ class Assignment(MoodleModel):
     cmid: int  # course module id, used for the link to the assignment page
     course: int
     name: str
-    duedate: datetime | None = None
-
-    @field_validator("duedate", mode="before")
-    @classmethod
-    def _zero_means_no_due_date(cls, value: object) -> object:
-        return None if value == 0 else value
+    duedate: OptionalTimestamp = None
 
 
 class Event(MoodleModel):

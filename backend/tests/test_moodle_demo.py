@@ -1,6 +1,8 @@
 from datetime import UTC, datetime, timedelta
 from urllib.parse import urlparse
 
+import pytest
+
 from app.moodle.demo import DemoMoodleClient
 from app.moodle.schemas import MoodleSource
 
@@ -118,3 +120,20 @@ def test_all_urls_use_invalid_host() -> None:
         parsed = urlparse(url)
         assert parsed.hostname == DEMO_HOST, url
         assert parsed.hostname is not None and parsed.hostname.endswith(".invalid")
+
+
+def test_naive_now_is_rejected() -> None:
+    with pytest.raises(ValueError, match="timezone-aware"):
+        DemoMoodleClient(now=datetime(2026, 11, 9, 12))
+
+
+@pytest.mark.parametrize(
+    ("start", "end"),
+    [
+        (datetime(2026, 11, 9), NOW + timedelta(days=30)),
+        (NOW, datetime(2026, 12, 9)),
+    ],
+)
+def test_upcoming_events_rejects_naive_datetimes(start: datetime, end: datetime) -> None:
+    with pytest.raises(ValueError, match="timezone-aware"):
+        make_demo().upcoming_events(start, end)
