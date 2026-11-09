@@ -25,6 +25,7 @@ Grundsatz: **Erst ein dünner, kompletter Durchstich, der jeden Tag Zeit spart �
 - [ ] Datenmodell: Kurse, Abschnitte, Dokumente, Abgaben, Termine, Ankündigungen, Sync-Läufe
 - [ ] Sync mit Änderungserkennung (neu / aktualisiert)
   - Secrets nach Dienst trennen: `app` bekommt nur die Variablen, die es braucht; den Moodle-Token nur der `worker` (Hinweis aus dem Claude-Review in PR #4)
+  - Anzahl API-Aufrufe pro Sync-Lauf messen (z. B. im Sync-Lauf protokollieren); bei vielen Aufrufen eine kleine Pause zwischen den Aufrufen einbauen (Abrufrate moderat halten)
 - [ ] JSON-API unter `/api` für Kurse, Dokumente, Fristen, Neuigkeiten
 - [ ] Dashboard (React-PWA): Start (Fristen + Neu), Kursliste, Kursansicht, Kurse ausblenden
   - Ankündigungs-HTML aus Moodle ist nicht vertrauenswürdig: nur bereinigt anzeigen (z. B. DOMPurify), Links nur `http(s)` (Hinweis aus dem Security-Review)

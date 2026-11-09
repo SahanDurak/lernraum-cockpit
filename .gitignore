@@ -10,6 +10,11 @@
 # Logs (Moodle sends the token as wstoken= in URLs, which easily ends up in logs)
 *.log
 
+# Debug captures of Moodle responses (contain tokens and real Lernraum data)
+*.har
+moodle_responses/
+*.response.json
+
 # Heruntergeladene Lernraum-Dateien und lokale Daten
 data/
 downloads/
