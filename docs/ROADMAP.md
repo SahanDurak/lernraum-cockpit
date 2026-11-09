@@ -17,9 +17,9 @@ Grundsatz: **Erst ein dünner, kompletter Durchstich, der jeden Tag Zeit spart �
   - GitHub Actions: Lint, Typen, Tests, Secret-Scan, Docker-Build (Jobs laufen, sobald `backend/`/`frontend/` existieren)
   - Claude-Review in Pull Requests über das Pro-Abo
   - Claude-Code-Hooks (z. B. Formatieren nach Änderungen, `.env` schützen)
-  - Branch Protection auf `main`: vorerst lokal (git-`pre-push`- und Claude-Hook), GitHub-seitig siehe nächste Aufgabe
+  - Branch Protection auf `main`: lokal (git-`pre-push`- und Claude-Hook), GitHub-seitig siehe nächste Aufgabe
   - `docs/HARNESS.md` mit Diagramm: Subagenten, Skills, Plugins, Hooks, CI, Review-Ablauf
-- [ ] **Branch Protection auf GitHub**, sobald GitHub Pro aktiv ist (Student Developer Pack): Merge nur per PR, required checks `ci` + `secret-scan`, keine Force-Pushes, kein Löschen von `main`; danach `claude.yml` auf `contents: write` umstellen, damit `@claude` Code ändern kann
+- [x] **Branch Protection auf GitHub** (Repo öffentlich statt GitHub Pro, 09.11.2026): Ruleset `protect-main` – Merge nur per PR, required checks `ci` + `secret-scan`, keine Force-Pushes, kein Löschen von `main`, offene Kommentare müssen erledigt sein; Secret Scanning mit Push Protection, Dependabot-Alerts; `claude.yml` auf `contents: write` umgestellt, damit `@claude` Code ändern kann
 - [ ] Projektgerüst: `backend/` (FastAPI, uv) + `frontend/` (React, Vite, TypeScript, Tailwind), Docker Compose (app, worker, db), mehrstufiges Dockerfile, Konfiguration über `.env`
 - [ ] Moodle-Client + Demo-Client mit Beispieldaten
 - [ ] Datenmodell: Kurse, Abschnitte, Dokumente, Abgaben, Termine, Ankündigungen, Sync-Läufe
@@ -42,3 +42,8 @@ Grundsatz: **Erst ein dünner, kompletter Durchstich, der jeden Tag Zeit spart �
 - [ ] MCP-Server (lokal, stdio) mit Tools: `suche`, `fristen`, `neu`, `kurs_inhalt`, `notiz_speichern`
 - [ ] LLM-Schicht: Schnittstelle + Adapter Anthropic und OpenAI-kompatibel, Fake-Adapter für Tests
 - [ ] Sortier-Agent für Ankündigungen (über die LLM-Schicht, Budget-Limit)
+
+## Offen
+
+- [ ] Ruleset für Tags und übrige Branches: `protect-main` schützt nur `main`; Tags (Erstellen/Löschen/Force-Push) und Feature-Branches (Force-Push, Löschen) sind ungeschützt – auch gegenüber `@claude` mit Schreibrechten
+- [ ] `persist-credentials: false` in `claude.yml` und `claude-review.yml` testen: Ohne die Option bleibt der Token im Checkout (`.git/config`) liegen; nur übernehmen, wenn die Claude-Action ihre Git-Authentifizierung trotzdem selbst einrichtet

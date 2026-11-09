@@ -34,19 +34,22 @@
 | 09.11.2026 | **Harness zuerst**: erste Aufgabe in Stufe 1 ist CI, Hooks, Branch Protection und `docs/HARNESS.md`, noch vor dem App-Gerüst | Jeder spätere Schritt läuft dann schon durch dieselben Prüfungen |
 | 09.11.2026 | **Lint/Format: ruff (Python), ESLint + Prettier (TypeScript); Secret-Scan: gitleaks** | Jeweils der verbreitete Standard; ruff ersetzt Linter und Formatter in einem Tool |
 | 09.11.2026 | **Secret-Scan doppelt**: gitleaks als git-`pre-commit`-Hook und in der CI (ganze Historie) | Lokal wird ein Secret gar nicht erst committet; die CI fängt alles ab, was am Hook vorbeikommt |
-| 09.11.2026 | **Branch Protection vorerst lokal**: git-`pre-push`-Hook + Claude-Hook blocken Pushes auf `main` | Im Free-Plan für private Repos nicht verfügbar; echte Branch Protection folgt mit GitHub Pro (Student Pack beantragt) |
+| 09.11.2026 | **Branch Protection vorerst lokal**: git-`pre-push`-Hook + Claude-Hook blocken Pushes auf `main` – *ergänzt am 09.11.2026: GitHub-seitig per Ruleset, siehe „Repo öffentlich“ unten; die lokalen Hooks bleiben als zusätzliche Schicht* | Im Free-Plan für private Repos nicht verfügbar; echte Branch Protection folgt mit GitHub Pro (Student Pack beantragt) |
 | 09.11.2026 | **Ein Sammel-Check `ci`** statt einzelner Jobs als required check | Required checks bleiben stabil, auch wenn Jobs dazukommen oder übersprungen werden |
 | 09.11.2026 | **Claude-Review nur beim Öffnen / `ready_for_review`**, keine Drafts; erneut per „@claude review“; nur für den Repo-Owner; Limits über `--max-turns`, Timeout, `concurrency` | Spart Pro-Kontingent; nichts läuft endlos |
-| 09.11.2026 | **`@claude` vorerst nur lesend** (`contents: read`): kommentiert und reviewt, ändert keinen Code; `write` erst mit Branch Protection | Ohne Branch Protection könnte der Workflow technisch direkt auf `main` schreiben |
+| 09.11.2026 | ~~**`@claude` vorerst nur lesend** (`contents: read`): kommentiert und reviewt, ändert keinen Code; `write` erst mit Branch Protection~~ – *ersetzt am 09.11.2026: `contents: write`, siehe unten* | Ohne Branch Protection könnte der Workflow technisch direkt auf `main` schreiben |
 | 09.11.2026 | **gitleaks immer mit `--redact`** und nur über Git (`gitleaks git`, `--staged`), **nie über den Arbeitsordner** (`gitleaks dir`); `protect.py` erzwingt das | Der Arbeitsordner enthält die echte `.env`; Secrets sollen nie in einer Ausgabe landen |
 | 09.11.2026 | **GitHub Actions auf Commit-SHAs gepinnt**, Updates per Dependabot; gitleaks-Download per Prüfsumme verifiziert | Schutz vor umgehängten Tags und manipulierten Downloads (Supply Chain) |
+| 09.11.2026 | **Repo öffentlich statt auf GitHub Pro (Student Pack) zu warten**; Branch Protection als Ruleset `protect-main`: Merge nur per PR, required checks `ci` + `secret-scan` (Branch muss aktuell sein), keine Force-Pushes, kein Löschen, offene Kommentare müssen erledigt sein, keine Bypass-Akteure; dazu `delete_branch_on_merge`, Secret Scanning mit Push Protection, Dependabot-Alerts | Für öffentliche Repos ist das alles kostenlos – kein Warten auf das Student Pack. Ein öffentliches Repo war ohnehin Ziel (Stufe 5, Portfolio). Risiko gering: Secrets nur in `.env`, Demo-Daten statt echter Lernraum-Daten, gitleaks lokal + CI, zusätzlich GitHubs Push Protection |
+| 09.11.2026 | **`@claude` mit `contents: write`**: darf auf eigene `claude/…`-Branches pushen, `main` schützt das Ruleset; läuft nur auf Issues/PRs, die der Owner selbst angelegt hat (keine fremden Forks) | Seit es Branch Protection gibt, kann der Workflow nicht mehr direkt auf `main` schreiben. Im öffentlichen Repo könnten fremde Issue-Texte oder Fork-Code Claude sonst per Prompt-Injection steuern – mit Schreibrechten und Token |
+| 09.11.2026 | **Claude GitHub App behält „Workflows: read/write“** (geprüft und bewusst akzeptiert) | `@claude` kann damit auch Workflow-Dateien auf eigenen Branches ändern; nach `main` kommt nichts ohne PR, grüne CI und mein Review |
+| 09.11.2026 | **Lokaler `pre-push`-Hook bleibt** zusätzlich zur Branch Protection | Fällt schon vor dem Push auf statt erst als Ablehnung von GitHub; kostet nichts |
 
 ## Offen
 
 | Frage | Stand |
 |---|---|
 | KI-Zugang über die TH (API) | Anfrage an Prof. Knuth gestellt; durch die LLM-Schicht kein Blocker mehr |
-| Branch Protection auf GitHub | wartet auf GitHub Pro (Student Developer Pack beantragt); Aufgabe in der Roadmap |
 | CD: wohin und wie deployen | klären mit Stufe 3 (Hosting) |
 | GoodNotes: welches Gerät, welche Cloud für das Auto-Backup? | klären vor Stufe 4 |
 | Datenbank-Migrationen (Alembic) | einführen, sobald sich das Datenmodell stabilisiert |

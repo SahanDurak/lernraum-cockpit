@@ -14,12 +14,22 @@ on:
 
 jobs:
   claude:
-    # Only the repo owner may trigger Claude (protects the Pro subscription quota).
+    # Only the repo owner may trigger Claude (protects the Pro subscription quota), and only
+    # on issues/PRs the owner authored: Claude runs with write access, so it must never read
+    # foreign issue text or check out code from foreign fork PRs (prompt injection, token theft).
     if: >-
       github.actor == github.repository_owner && (
-        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+        (github.event_name == 'issue_comment' &&
+          github.event.issue.user.login == github.repository_owner &&
+          contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' &&
+          github.event.pull_request.user.login == github.repository_owner &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review' &&
+          github.event.pull_request.user.login == github.repository_owner &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          contains(github.event.review.body, '@claude')) ||
         (github.event_name == 'issues' &&
           github.event.issue.user.login == github.repository_owner &&
           (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
@@ -33,9 +43,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
-      # read until GitHub branch protection exists (see docs/ROADMAP.md); then write,
-      # so @claude can push changes to its own claude/... branches.
-      contents: read
+      # write, so @claude can push changes to its own claude/... branches.
+      # main is protected by the ruleset "protect-main" (PR only, no bypass actors).
+      contents: write
       pull-requests: write
       issues: write
       id-token: write
