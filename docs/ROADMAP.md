@@ -21,13 +21,15 @@ Grundsatz: **Erst ein dünner, kompletter Durchstich, der jeden Tag Zeit spart �
   - `docs/HARNESS.md` mit Diagramm: Subagenten, Skills, Plugins, Hooks, CI, Review-Ablauf
 - [x] **Branch Protection auf GitHub** (Repo öffentlich statt GitHub Pro, 09.11.2026): Ruleset `protect-main` – Merge nur per PR, required checks `ci` + `secret-scan`, keine Force-Pushes, kein Löschen von `main`, offene Kommentare müssen erledigt sein; Secret Scanning mit Push Protection, Dependabot-Alerts; `claude.yml` auf `contents: write` umgestellt, damit `@claude` Code ändern kann
 - [x] Projektgerüst: `backend/` (FastAPI, uv) + `frontend/` (React, Vite, TypeScript, Tailwind), Docker Compose (app, worker, db), mehrstufiges Dockerfile, Konfiguration über `.env` – mit `/api/health`, Healthchecks, Versionen gepinnt (`.nvmrc`, `.python-version`, Image-Digests), Dependabot für uv/npm/Docker
-- [ ] Moodle-Client + Demo-Client mit Beispieldaten
+- [x] Moodle-Client + Demo-Client mit Beispieldaten (`app/moodle/`: Schnittstelle `MoodleSource`, echter Client, Demo-Client; `mod_assign`/`mod_forum` noch nicht gegen den echten Lernraum getestet → „Erster echter Sync“)
 - [ ] Datenmodell: Kurse, Abschnitte, Dokumente, Abgaben, Termine, Ankündigungen, Sync-Läufe
 - [ ] Sync mit Änderungserkennung (neu / aktualisiert)
   - Secrets nach Dienst trennen: `app` bekommt nur die Variablen, die es braucht; den Moodle-Token nur der `worker` (Hinweis aus dem Claude-Review in PR #4)
 - [ ] JSON-API unter `/api` für Kurse, Dokumente, Fristen, Neuigkeiten
 - [ ] Dashboard (React-PWA): Start (Fristen + Neu), Kursliste, Kursansicht, Kurse ausblenden
+  - Ankündigungs-HTML aus Moodle ist nicht vertrauenswürdig: nur bereinigt anzeigen (z. B. DOMPurify), Links nur `http(s)` (Hinweis aus dem Security-Review)
 - [ ] Dateien über die App öffnen (Token bleibt auf dem Server)
+  - Token nur an Datei-URLs mit `https` und exakt dem Host aus `MOODLE_URL` senden (Hinweis aus dem Security-Review)
 - [ ] Telegram: neue Inhalte nach jedem Sync, tägliche Fristen-Erinnerung
 - [ ] Tests mit Fake-Client (pytest) und Frontend-Tests (Vitest), in der CI
 - [ ] Erster echter Sync mit dem TH-Lernraum

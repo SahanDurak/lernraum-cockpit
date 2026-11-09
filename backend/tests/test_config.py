@@ -19,3 +19,29 @@ def test_sync_interval_must_be_positive(monkeypatch: pytest.MonkeyPatch) -> None
     monkeypatch.setenv("SYNC_INTERVAL_MINUTES", "0")
     with pytest.raises(ValidationError):
         Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
+
+
+def test_moodle_settings_are_read_from_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DEMO_MODE", "true")
+    monkeypatch.setenv("MOODLE_URL", "https://moodle.example.invalid")
+    monkeypatch.setenv("MOODLE_TOKEN", "test-token")
+    settings = Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
+    assert settings.demo_mode is True
+    assert settings.moodle_url == "https://moodle.example.invalid"
+    assert settings.moodle_token.get_secret_value() == "test-token"
+
+
+def test_moodle_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
+    for name in ("DEMO_MODE", "MOODLE_URL", "MOODLE_TOKEN"):
+        monkeypatch.delenv(name, raising=False)
+    settings = Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
+    assert settings.demo_mode is False
+    assert settings.moodle_url == ""  # never a real Lernraum without configuration
+    assert settings.moodle_token.get_secret_value() == ""
+
+
+def test_token_is_not_in_repr(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("MOODLE_TOKEN", "test-token")
+    settings = Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
+    assert "test-token" not in repr(settings)
+    assert "test-token" not in str(settings)
