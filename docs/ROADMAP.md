@@ -42,3 +42,8 @@ Grundsatz: **Erst ein dünner, kompletter Durchstich, der jeden Tag Zeit spart �
 - [ ] MCP-Server (lokal, stdio) mit Tools: `suche`, `fristen`, `neu`, `kurs_inhalt`, `notiz_speichern`
 - [ ] LLM-Schicht: Schnittstelle + Adapter Anthropic und OpenAI-kompatibel, Fake-Adapter für Tests
 - [ ] Sortier-Agent für Ankündigungen (über die LLM-Schicht, Budget-Limit)
+
+## Offen
+
+- [ ] Ruleset für Tags und übrige Branches: `protect-main` schützt nur `main`; Tags (Erstellen/Löschen/Force-Push) und Feature-Branches (Force-Push, Löschen) sind ungeschützt – auch gegenüber `@claude` mit Schreibrechten
+- [ ] `persist-credentials: false` in `claude.yml` und `claude-review.yml` testen: Ohne die Option bleibt der Token im Checkout (`.git/config`) liegen; nur übernehmen, wenn die Claude-Action ihre Git-Authentifizierung trotzdem selbst einrichtet
