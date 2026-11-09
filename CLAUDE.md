@@ -18,3 +18,9 @@ Lernraum Cockpit: persönliches Studien-Cockpit. Synchronisiert den TH-Lernraum 
 - Backend: Python, FastAPI, PostgreSQL, httpx
 - Frontend: noch offen (siehe docs/ENTSCHEIDUNGEN.md)
 - Betrieb: Docker Compose
+
+## Arbeitsweise (nach Karpathys Coding-Regeln)
+1. **Erst denken, dann coden:** Annahmen nennen, bei Unklarheit fragen statt raten.
+2. **So einfach wie möglich:** kein Code „für später“, keine unnötigen Abstraktionen.
+3. **Gezielte Änderungen:** nur anfassen, was die Aufgabe braucht; nichts nebenbei umbauen.
+4. **Ziel vorher festlegen:** vor dem Umsetzen sagen, woran wir erkennen, dass es funktioniert (Test oder Prüfschritt).
