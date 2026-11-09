@@ -24,6 +24,7 @@ Grundsatz: **Erst ein dünner, kompletter Durchstich, der jeden Tag Zeit spart �
 - [ ] Moodle-Client + Demo-Client mit Beispieldaten
 - [ ] Datenmodell: Kurse, Abschnitte, Dokumente, Abgaben, Termine, Ankündigungen, Sync-Läufe
 - [ ] Sync mit Änderungserkennung (neu / aktualisiert)
+  - Secrets nach Dienst trennen: `app` bekommt nur die Variablen, die es braucht; den Moodle-Token nur der `worker` (Hinweis aus dem Claude-Review in PR #4)
 - [ ] JSON-API unter `/api` für Kurse, Dokumente, Fristen, Neuigkeiten
 - [ ] Dashboard (React-PWA): Start (Fristen + Neu), Kursliste, Kursansicht, Kurse ausblenden
 - [ ] Dateien über die App öffnen (Token bleibt auf dem Server)

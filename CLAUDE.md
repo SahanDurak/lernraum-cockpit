@@ -15,6 +15,7 @@ Lernraum Cockpit: persönliches Studien-Cockpit. Synchronisiert den TH-Lernraum 
 - Neue Entscheidungen in `docs/ENTSCHEIDUNGEN.md` festhalten, Fortschritt in `docs/ROADMAP.md`.
 - LLM-Aufrufe nur über die eigene LLM-Schicht (`backend/app/llm/`), nie direkt ein Anbieter-SDK im übrigen Code.
 - Immer auf Feature-Branches arbeiten, nie direkt auf `main`. Merge nach `main` nur per Pull Request (mit grüner CI, sobald sie existiert). Ablauf: Skill `naechste-aufgabe`.
+- Commit- und PR-Texte nie inline (`-m`, `--body`): Text mit dem Write-Tool nach `.git/COMMIT_MSG_DRAFT` bzw. `.git/PR_BODY_DRAFT` schreiben, dann `git commit -F .git/COMMIT_MSG_DRAFT && rm .git/COMMIT_MSG_DRAFT` bzw. `gh pr create --title "…" --body-file .git/PR_BODY_DRAFT && rm .git/PR_BODY_DRAFT` (aus dem Repo-Root). Der PR-Titel bleibt inline, also ohne den Dateinamen `.env`. Grund: `docs/HARNESS.md`.
 
 ## Stack (Stand 09.11.2026)
 - Backend: Python (uv), FastAPI (JSON-API unter `/api`), PostgreSQL + pgvector, httpx – Code in `backend/`

@@ -1,0 +1,10 @@
+// For the editor (pyright LSP started at the repo root).
+// CI runs pyright in backend/ with [tool.pyright] from backend/pyproject.toml.
+{
+  "include": ["backend", "scripts", ".claude/hooks"],
+  "exclude": ["**/node_modules", "**/__pycache__", "**/.venv"],
+  "executionEnvironments": [{ "root": "backend" }, { "root": ".claude/hooks" }, { "root": "scripts" }],
+  "venvPath": "backend",
+  "venv": ".venv",
+  "pythonVersion": "3.13"
+}
