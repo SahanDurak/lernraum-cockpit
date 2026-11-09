@@ -13,11 +13,16 @@ Lernraum Cockpit: persönliches Studien-Cockpit. Synchronisiert den TH-Lernraum 
 - Nur offizielle Moodle-Web-Services, kein Scraping. Abrufrate moderat halten.
 - Kleine, nachvollziehbare Schritte; nach jedem Schritt testen.
 - Neue Entscheidungen in `docs/ENTSCHEIDUNGEN.md` festhalten, Fortschritt in `docs/ROADMAP.md`.
+- LLM-Aufrufe nur über die eigene LLM-Schicht (`backend/app/llm/`), nie direkt ein Anbieter-SDK im übrigen Code.
+- Immer auf Feature-Branches arbeiten, nie direkt auf `main`. Merge nach `main` nur per Pull Request (mit grüner CI, sobald sie existiert). Ablauf: Skill `naechste-aufgabe`.
 
-## Stack (Stand Phase 0)
-- Backend: Python, FastAPI, PostgreSQL, httpx
-- Frontend: noch offen (siehe docs/ENTSCHEIDUNGEN.md)
-- Betrieb: Docker Compose
+## Stack (Stand 09.11.2026)
+- Backend: Python (uv), FastAPI (JSON-API unter `/api`), PostgreSQL + pgvector, httpx – Code in `backend/`
+- Frontend: React + Vite + TypeScript + Tailwind (PWA) – Code in `frontend/`
+- Im Betrieb liefert FastAPI das gebaute Frontend als statische Dateien aus; im Dev-Modus läuft Vite mit Proxy auf `/api`.
+- LLM: austauschbar über `LLM_PROVIDER` (Adapter `anthropic` oder `openai`-kompatibel)
+- Betrieb: Docker Compose mit `app`, `worker`, `db`
+- Harness: CI mit GitHub Actions, Claude-Hooks, Subagenten, Skills, Plugins – siehe `docs/HARNESS.md` (entsteht in Stufe 1)
 
 ## Arbeitsweise (nach Karpathys Coding-Regeln)
 1. **Erst denken, dann coden:** Annahmen nennen, bei Unklarheit fragen statt raten.
