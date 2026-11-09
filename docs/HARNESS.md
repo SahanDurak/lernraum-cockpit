@@ -11,12 +11,14 @@ flowchart TD
     C --> D{{"Claude-Code-Hooks<br/>protect.py: .env + main blockiert<br/>format.py: ruff / Prettier"}}
     D --> E["Subagenten<br/>tester → security-reviewer"]
     E --> F{{"Git-Hooks<br/>pre-commit: gitleaks<br/>pre-push: kein Push auf main"}}
-    F --> G["Pull Request gegen main"]
+    F --> P{{"GitHub Push Protection<br/>Secret Scanning"}}
+    P --> G["Pull Request gegen main"]
     G --> H["CI (GitHub Actions)<br/>ci + secret-scan"]
     G --> I["Claude-Review<br/>automatisch beim Öffnen"]
     I -. "@claude review<br/>nach neuen Pushes" .-> J["claude.yml"]
-    H --> K["Review durch mich → Merge"]
-    I --> K
+    H --> R{{"Ruleset protect-main<br/>Checks grün, Kommentare erledigt"}}
+    I --> R
+    R --> K["Review durch mich → Merge<br/>Branch wird automatisch gelöscht"]
 ```
 
 ## Bausteine
@@ -31,13 +33,16 @@ flowchart TD
 | Claude Code | Hook `protect.py` (PreToolUse) | `.claude/hooks/protect.py` | Blockt Zugriff auf `.env*` (außer `.env.example`), `git commit`/`git push` auf `main`, `--no-verify` und gitleaks-Läufe ohne `--redact` oder über den Arbeitsordner |
 | Claude Code | Hook `format.py` (PostToolUse) | `.claude/hooks/format.py` | Formatiert geänderte Dateien mit ruff (backend) bzw. Prettier (frontend), sobald installiert |
 | Git lokal | `pre-commit` | `.githooks/pre-commit` | gitleaks prüft die gestagten Änderungen – ein Secret wird gar nicht erst committet |
-| Git lokal | `pre-push` | `.githooks/pre-push` | Lehnt Pushes auf `main` ab (Ersatz für Branch Protection, siehe unten) |
+| Git lokal | `pre-push` | `.githooks/pre-push` | Lehnt Pushes auf `main` ab – zusätzliche Schicht zur Branch Protection, fällt schon lokal auf |
 | GitHub | CI | `.github/workflows/ci.yml` | Siehe nächster Abschnitt |
 | GitHub | Claude-Review | `.github/workflows/claude-review.yml` | Review beim Öffnen eines PRs und bei `ready_for_review`; Drafts übersprungen; max. 15 Turns / 15 min |
-| GitHub | `@claude` | `.github/workflows/claude.yml` | Aufgaben per `@claude` in PRs und Issues (z. B. „@claude review“); max. 25 Turns / 30 min; vorerst nur lesend (`contents: read`) |
+| GitHub | `@claude` | `.github/workflows/claude.yml` | Aufgaben per `@claude` in PRs und Issues (z. B. „@claude review“); max. 25 Turns / 30 min; darf auf eigene `claude/…`-Branches pushen (`contents: write`), `main` schützt das Ruleset |
 | GitHub | Dependabot | `.github/dependabot.yml` | Hält die gepinnten Action-Versionen aktuell (wöchentlich) |
+| GitHub | Ruleset `protect-main` | Repo-Einstellungen | Branch Protection auf `main`, siehe unten |
+| GitHub | Secret Scanning + Push Protection | Repo-Einstellungen | GitHub lehnt Pushes mit erkannten Secrets ab und meldet Funde |
+| GitHub | Dependabot-Alerts | Repo-Einstellungen | Meldet bekannte Sicherheitslücken in Abhängigkeiten |
 
-Beide Claude-Workflows reagieren nur auf den Repo-Owner (schützt das Pro-Kontingent) und laufen über das **Pro-Abo** (Secret `CLAUDE_CODE_OAUTH_TOKEN`), nicht über die API.
+Beide Claude-Workflows reagieren nur auf den Repo-Owner (schützt das Pro-Kontingent) und nur auf Issues/PRs, die der Owner selbst angelegt hat – Claude liest so keine fremden Texte und keinen Code aus fremden Forks (Schutz vor Prompt-Injection), und laufen über das **Pro-Abo** (Secret `CLAUDE_CODE_OAUTH_TOKEN`), nicht über die API.
 
 ## CI
 
@@ -50,7 +55,7 @@ Beide Claude-Workflows reagieren nur auf den Repo-Owner (schützt das Pro-Kontin
 | `secret-scan` | immer | gitleaks über die **ganze** Git-Historie |
 | `ci` | immer | Sammel-Check: rot, wenn einer der Jobs oben fehlschlägt; übersprungene Jobs zählen als bestanden |
 
-Die **required checks** sind später nur `ci` und `secret-scan` – stabil, egal welche Jobs noch dazukommen.
+Die **required checks** sind nur `ci` und `secret-scan` – stabil, egal welche Jobs noch dazukommen.
 
 Vertrag für das Projektgerüst: Das Frontend muss die npm-Skripte `lint`, `format:check`, `typecheck` und `test` (einmaliger Lauf, kein Watch-Modus) anbieten; das Backend `ruff`, `pyright` und `pytest` als Dev-Abhängigkeiten in `pyproject.toml`.
 
@@ -90,14 +95,17 @@ Die lokalen Hooks sind ein Sicherheitsnetz gegen Versehen, keine Festung:
 
 - `protect.py` prüft Text, keine echte Shell: Dateinamen wie `prod.env` oder Shell-Globs (`cat .en?`) erkennt es nicht. Erwähnt ein Befehl `.env` nur im Text (z. B. Commit-Message), wird er trotzdem geblockt – lieber einmal zu vorsichtig.
 - Bei unlesbarer Eingabe blockt `protect.py` (fail-closed); `format.py` blockt nie.
-- `git … --no-verify` umgeht die Git-Hooks. Claude darf das nicht (`protect.py` blockt es), ich selbst könnte es. Endgültig schützt erst die CI (`secret-scan`) und die Branch Protection auf GitHub.
-- `claude.yml` ist vorerst nur lesend (`contents: read`): Ohne Branch Protection könnte der Workflow sonst direkt auf `main` schreiben – der lokale `pre-push`-Hook greift im Runner nicht. Umstellung auf `write` ist Teil der Roadmap-Aufgabe „Branch Protection“.
+- `git … --no-verify` umgeht die Git-Hooks. Claude darf das nicht (`protect.py` blockt es), ich selbst könnte es. Endgültig schützen die CI (`secret-scan`), GitHubs Push Protection und die Branch Protection auf GitHub.
+- Der lokale `pre-push`-Hook greift nicht im GitHub-Runner – dort schützt nur das Ruleset `main` vor `claude.yml`. Die Action holt sich per OIDC (`id-token: write`) einen Token der Claude GitHub App; dessen Rechte bestimmt die App-Installation, nicht allein der `permissions:`-Block. Die echte Grenze sind also Ruleset + App-Rechte. Andere Branches und Tags schützt das Ruleset nicht.
 - Die `deny`-Regeln in `.claude/settings.json` nennen nur konkrete Namen (`.env`, `.env.local`, `.env.*.local`, `.env.production`), weil `deny` immer Vorrang hat und ein Muster wie `.env*` auch `.env.example` sperren würde. Alle übrigen Varianten fängt `protect.py` ab.
 
 ## Branch Protection
 
-Im kostenlosen Plan gibt es für private Repos keine Branch Protection (GitHub: HTTP 403). **Bis GitHub Pro aktiv ist** (Student Developer Pack beantragt), schützen lokal der `pre-push`-Hook und der Claude-Hook `protect.py` vor Pushes auf `main`. Danach wird eingerichtet:
+Das Repo ist öffentlich – dadurch ist Branch Protection auch im kostenlosen Plan verfügbar (Entscheidung in `docs/ENTSCHEIDUNGEN.md`). Ruleset **`protect-main`** auf dem Default-Branch, ohne Bypass-Akteure:
 
 - Merge nach `main` nur per Pull Request
-- Required checks: `ci`, `secret-scan`
+- Required checks: `ci`, `secret-scan` – der Branch muss auf dem aktuellen Stand von `main` sein
+- Offene Review-Kommentare müssen erledigt sein
 - Keine Force-Pushes, kein Löschen von `main`
+
+Dazu: gemergte Branches werden automatisch gelöscht (`delete_branch_on_merge`), Secret Scanning mit Push Protection und Dependabot-Alerts sind an. Lokal blocken weiterhin der `pre-push`-Hook und `protect.py` Pushes auf `main` – so fällt ein Versehen schon vor dem Push auf.
