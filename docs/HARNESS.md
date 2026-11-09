@@ -35,7 +35,7 @@ flowchart TD
 | Git lokal | `pre-commit` | `.githooks/pre-commit` | gitleaks prüft die gestagten Änderungen – ein Secret wird gar nicht erst committet |
 | Git lokal | `pre-push` | `.githooks/pre-push` | Lehnt Pushes auf `main` ab – zusätzliche Schicht zur Branch Protection, fällt schon lokal auf |
 | GitHub | CI | `.github/workflows/ci.yml` | Siehe nächster Abschnitt |
-| GitHub | Claude-Review | `.github/workflows/claude-review.yml` | Review beim Öffnen eines PRs und bei `ready_for_review`; Drafts übersprungen; max. 15 Turns / 15 min |
+| GitHub | Claude-Review | `.github/workflows/claude-review.yml` | Review beim Öffnen eines PRs und bei `ready_for_review`; Drafts übersprungen; max. 30 Turns / 15 min; darf nur `gh pr view/diff/comment`, Inline-Kommentare und Read/Glob/Grep (keine Schreib-Tools) |
 | GitHub | `@claude` | `.github/workflows/claude.yml` | Aufgaben per `@claude` in PRs und Issues (z. B. „@claude review“); max. 25 Turns / 30 min; darf auf eigene `claude/…`-Branches pushen (`contents: write`), `main` schützt das Ruleset |
 | GitHub | Dependabot | `.github/dependabot.yml` | Hält Actions, Python- (uv) und npm-Pakete sowie Docker-Images (Dockerfile, Compose) aktuell; wöchentlich, 7 Tage Wartezeit nach einem Release |
 | GitHub | Ruleset `protect-main` | Repo-Einstellungen | Branch Protection auf `main`, siehe unten |

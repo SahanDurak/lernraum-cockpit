@@ -36,6 +36,12 @@ jobs:
             PR NUMBER: ${{ github.event.pull_request.number }}
 
             Review this pull request. Follow the rules in CLAUDE.md and the docs in docs/.
+
+            Work in this order to save turns:
+            1. Run `gh pr view` and `gh pr diff` once each. Do not pipe their output.
+            2. Read CLAUDE.md. Read files in docs/ only if relevant to the changes.
+            3. Read only files changed by the PR when the diff is not enough.
+
             Focus on:
             - bugs and logic errors
             - security: tokens, passwords or real Lernraum data in code, tests or logs;
@@ -43,9 +49,9 @@ jobs:
             - no LLM provider SDK outside backend/app/llm/
             - unnecessary complexity (keep it as simple as possible)
 
-            Use `gh pr diff` and `gh pr view` to read the PR. Post inline comments for
-            specific issues and one short summary comment with `gh pr comment`.
-            Write all comments in German. If everything is fine, say so briefly.
+            Post inline comments for specific issues and one short summary comment with
+            `gh pr comment`. Write all comments in German. If everything is fine, say so briefly.
+            Always post the summary comment, even if you could not finish the full review.
           claude_args: |
-            --max-turns 15
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --max-turns 30
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Glob,Grep"

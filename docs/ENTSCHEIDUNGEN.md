@@ -51,6 +51,7 @@
 | 09.11.2026 | **Docker: Basis-Images per Digest gepinnt** (Dependabot aktualisiert), Image läuft als Nicht-root-User, `npm ci --ignore-scripts`; `.dockerignore` hält `.env` und lokale Daten auf allen Ebenen raus (`**/`); `app`/`worker` mit `read_only`, `cap_drop: ALL`, `no-new-privileges` | Gleiche Supply-Chain-Regel wie bei den Actions; weniger Rechte im Container; keine Secrets im Image (eine `frontend/.env` würde Vite sonst ins Bundle schreiben) |
 | 09.11.2026 | **Compose**: `app` und `worker` aus einem Image, starten erst, wenn `db` healthy ist; Healthcheck für `app` auf `/api/health`; Ports nur auf `127.0.0.1`; DB-Image `pgvector/pgvector:pg16` | Kein Start gegen eine nicht bereite DB; Dienste nicht aus dem Netz erreichbar; pgvector ist für Stufe 2 schon da |
 | 09.11.2026 | **Datenbankzugang (`db.py`, SQLAlchemy) erst mit der Aufgabe „Datenmodell“** | Gerüst ohne Code für später |
+| 09.11.2026 | **Claude-Review darf lesen**: `Read`, `Glob`, `Grep` zusätzlich zu `gh pr view/diff/comment` und Inline-Kommentaren; weiterhin keine Schreib-Tools und keine weiteren Bash-Rechte; `--max-turns` 30 statt 15; Prompt gibt eine sparsame Reihenfolge vor | Der Prompt verlangt `CLAUDE.md` und `docs/` zu lesen – ohne Lese-Tools verbrauchte der Bot alle 15 Runden mit abgelehnten Versuchen und brach ab |
 
 ## Offen
 
