@@ -44,6 +44,13 @@
 | 09.11.2026 | **`@claude` mit `contents: write`**: darf auf eigene `claude/…`-Branches pushen, `main` schützt das Ruleset; läuft nur auf Issues/PRs, die der Owner selbst angelegt hat (keine fremden Forks) | Seit es Branch Protection gibt, kann der Workflow nicht mehr direkt auf `main` schreiben. Im öffentlichen Repo könnten fremde Issue-Texte oder Fork-Code Claude sonst per Prompt-Injection steuern – mit Schreibrechten und Token |
 | 09.11.2026 | **Claude GitHub App behält „Workflows: read/write“** (geprüft und bewusst akzeptiert) | `@claude` kann damit auch Workflow-Dateien auf eigenen Branches ändern; nach `main` kommt nichts ohne PR, grüne CI und mein Review |
 | 09.11.2026 | **Lokaler `pre-push`-Hook bleibt** zusätzlich zur Branch Protection | Fällt schon vor dem Push auf statt erst als Ablehnung von GitHub; kostet nichts |
+| 09.11.2026 | **Python 3.13, Node 24** – je an einer Stelle festgelegt (`backend/.python-version`, `.nvmrc` + `engines` mit `engine-strict`); CI und Dockerfile nutzen dieselben Versionen; Lockfiles (`uv.lock`, `package-lock.json`) im Repo | Lokal, CI und Image bauen gleich; keine „läuft nur bei mir“-Fehler |
+| 09.11.2026 | **Konfiguration mit pydantic-settings** (`app/config.py`); nur Felder, die der Code tatsächlich nutzt | Typgeprüft, liest Umgebung und `.env`; wächst mit den Aufgaben statt auf Vorrat |
+| 09.11.2026 | **Tailwind CSS v4** über das Vite-Plugin, keine eigene Tailwind-Konfiguration | Aktuelle Version, weniger Dateien |
+| 09.11.2026 | **FastAPI liefert `frontend/dist` mit Fallback auf `index.html`**, außer für `/api/…` (bleibt JSON-404) | Client-Routing funktioniert; Tippfehler in API-Pfaden fallen auf statt HTML zu liefern |
+| 09.11.2026 | **Docker: Basis-Images per Digest gepinnt** (Dependabot aktualisiert), Image läuft als Nicht-root-User, `npm ci --ignore-scripts`; `.dockerignore` hält `.env` und lokale Daten auf allen Ebenen raus (`**/`); `app`/`worker` mit `read_only`, `cap_drop: ALL`, `no-new-privileges` | Gleiche Supply-Chain-Regel wie bei den Actions; weniger Rechte im Container; keine Secrets im Image (eine `frontend/.env` würde Vite sonst ins Bundle schreiben) |
+| 09.11.2026 | **Compose**: `app` und `worker` aus einem Image, starten erst, wenn `db` healthy ist; Healthcheck für `app` auf `/api/health`; Ports nur auf `127.0.0.1`; DB-Image `pgvector/pgvector:pg16` | Kein Start gegen eine nicht bereite DB; Dienste nicht aus dem Netz erreichbar; pgvector ist für Stufe 2 schon da |
+| 09.11.2026 | **Datenbankzugang (`db.py`, SQLAlchemy) erst mit der Aufgabe „Datenmodell“** | Gerüst ohne Code für später |
 
 ## Offen
 

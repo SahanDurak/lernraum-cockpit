@@ -20,7 +20,7 @@ Grundsatz: **Erst ein dünner, kompletter Durchstich, der jeden Tag Zeit spart �
   - Branch Protection auf `main`: lokal (git-`pre-push`- und Claude-Hook), GitHub-seitig siehe nächste Aufgabe
   - `docs/HARNESS.md` mit Diagramm: Subagenten, Skills, Plugins, Hooks, CI, Review-Ablauf
 - [x] **Branch Protection auf GitHub** (Repo öffentlich statt GitHub Pro, 09.11.2026): Ruleset `protect-main` – Merge nur per PR, required checks `ci` + `secret-scan`, keine Force-Pushes, kein Löschen von `main`, offene Kommentare müssen erledigt sein; Secret Scanning mit Push Protection, Dependabot-Alerts; `claude.yml` auf `contents: write` umgestellt, damit `@claude` Code ändern kann
-- [ ] Projektgerüst: `backend/` (FastAPI, uv) + `frontend/` (React, Vite, TypeScript, Tailwind), Docker Compose (app, worker, db), mehrstufiges Dockerfile, Konfiguration über `.env`
+- [x] Projektgerüst: `backend/` (FastAPI, uv) + `frontend/` (React, Vite, TypeScript, Tailwind), Docker Compose (app, worker, db), mehrstufiges Dockerfile, Konfiguration über `.env` – mit `/api/health`, Healthchecks, Versionen gepinnt (`.nvmrc`, `.python-version`, Image-Digests), Dependabot für uv/npm/Docker
 - [ ] Moodle-Client + Demo-Client mit Beispieldaten
 - [ ] Datenmodell: Kurse, Abschnitte, Dokumente, Abgaben, Termine, Ankündigungen, Sync-Läufe
 - [ ] Sync mit Änderungserkennung (neu / aktualisiert)

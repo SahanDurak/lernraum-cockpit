@@ -49,6 +49,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      # uv installs the Python version from backend/.python-version (same as the Dockerfile).
       - run: uv sync --locked
       - name: Lint
         run: uv run ruff check .
@@ -72,7 +73,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version-file: .nvmrc # same major version as engines and the Dockerfile
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci

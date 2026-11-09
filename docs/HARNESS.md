@@ -37,7 +37,7 @@ flowchart TD
 | GitHub | CI | `.github/workflows/ci.yml` | Siehe nächster Abschnitt |
 | GitHub | Claude-Review | `.github/workflows/claude-review.yml` | Review beim Öffnen eines PRs und bei `ready_for_review`; Drafts übersprungen; max. 15 Turns / 15 min |
 | GitHub | `@claude` | `.github/workflows/claude.yml` | Aufgaben per `@claude` in PRs und Issues (z. B. „@claude review“); max. 25 Turns / 30 min; darf auf eigene `claude/…`-Branches pushen (`contents: write`), `main` schützt das Ruleset |
-| GitHub | Dependabot | `.github/dependabot.yml` | Hält die gepinnten Action-Versionen aktuell (wöchentlich) |
+| GitHub | Dependabot | `.github/dependabot.yml` | Hält Actions, Python- (uv) und npm-Pakete sowie Docker-Images (Dockerfile, Compose) aktuell; wöchentlich, 7 Tage Wartezeit nach einem Release |
 | GitHub | Ruleset `protect-main` | Repo-Einstellungen | Branch Protection auf `main`, siehe unten |
 | GitHub | Secret Scanning + Push Protection | Repo-Einstellungen | GitHub lehnt Pushes mit erkannten Secrets ab und meldet Funde |
 | GitHub | Dependabot-Alerts | Repo-Einstellungen | Meldet bekannte Sicherheitslücken in Abhängigkeiten |
