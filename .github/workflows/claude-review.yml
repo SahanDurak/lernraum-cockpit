@@ -1,0 +1,51 @@
+name: Claude Review
+
+# Automatic review once per PR (when opened or marked ready). For a re-review
+# after new pushes, comment "@claude review" on the PR (handled by claude.yml).
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # Skip drafts, and only review PRs by the repo owner so nobody else
+    # (including Dependabot) can use up the Pro subscription quota.
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+      - uses: anthropics/claude-code-action@61a9c274fa7110a66dfafc1bbbced03833eb25fe # v1.0.269
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request. Follow the rules in CLAUDE.md and the docs in docs/.
+            Focus on:
+            - bugs and logic errors
+            - security: tokens, passwords or real Lernraum data in code, tests or logs;
+              the Moodle token must never reach the browser; only official Moodle web services
+            - no LLM provider SDK outside backend/app/llm/
+            - unnecessary complexity (keep it as simple as possible)
+
+            Use `gh pr diff` and `gh pr view` to read the PR. Post inline comments for
+            specific issues and one short summary comment with `gh pr comment`.
+            Write all comments in German. If everything is fine, say so briefly.
+          claude_args: |
+            --max-turns 15
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

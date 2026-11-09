@@ -57,7 +57,7 @@ Ein Projektziel ist zu zeigen, wie ich mit aktuellen Agent-Workflows entwickle:
 - **Claude-Review** in jedem Pull Request (über das Pro-Abo)
 - **Branch Protection** auf `main`, später **CD**
 
-Details: `docs/HARNESS.md` (entsteht als erste Aufgabe in Stufe 1)
+Details: [docs/HARNESS.md](docs/HARNESS.md)
 
 ## Dokumentation
 
@@ -69,7 +69,7 @@ Details: `docs/HARNESS.md` (entsteht als erste Aufgabe in Stufe 1)
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phasen mit Ergebnissen |
 | [docs/ENTSCHEIDUNGEN.md](docs/ENTSCHEIDUNGEN.md) | Getroffene Entscheidungen und offene Fragen |
 | [docs/MOODLE_API.md](docs/MOODLE_API.md) | Ergebnisse des API-Tests und genutzte Funktionen |
-| `docs/HARNESS.md` | CI, Hooks, Agenten-Workflow mit Diagramm (folgt in Stufe 1) |
+| [docs/HARNESS.md](docs/HARNESS.md) | CI, Hooks, Agenten-Workflow mit Diagramm |
 
 ## Datenschutz
 

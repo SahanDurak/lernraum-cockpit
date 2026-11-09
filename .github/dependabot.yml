@@ -1,0 +1,10 @@
+version: 2
+updates:
+  # Keep the pinned action SHAs up to date.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # Wait a week before proposing a new release (time to spot compromised releases).
+    cooldown:
+      default-days: 7
