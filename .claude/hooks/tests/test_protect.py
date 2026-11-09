@@ -14,7 +14,15 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from protect import ENV_BLOCKED, check
+import protect
+from protect import ENV_BLOCKED, MAIN_BLOCKED, check
+
+
+@pytest.fixture(autouse=True)
+def on_feature_branch(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The hook asks git for the current branch; on main it blocks every commit.
+    # Pin it so the results do not depend on where the tests run (e.g. CI on main).
+    monkeypatch.setattr(protect, "current_branch", lambda _cwd: "chore/test")
 
 
 def bash(command: str) -> str | None:
@@ -91,6 +99,11 @@ def test_file_tools_still_block_env_paths(path: str) -> None:
 
 def test_file_tools_allow_env_example() -> None:
     assert check({"tool_name": "Read", "tool_input": {"file_path": "/repo/.env.example"}}) is None
+
+
+def test_commit_from_file_is_blocked_on_main(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(protect, "current_branch", lambda _cwd: "main")
+    assert bash("git commit -F .git/COMMIT_MSG_DRAFT") == MAIN_BLOCKED
 
 
 def test_write_tool_allows_draft_files() -> None:
