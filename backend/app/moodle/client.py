@@ -84,7 +84,11 @@ class MoodleClient:
             raise MoodleError(function, "http", f"HTTP {status}") from None
         except httpx2.HTTPError as error:
             raise MoodleError(function, "network", type(error).__name__) from None
-        result = response.json()
+        try:
+            result = response.json()
+        except ValueError:
+            # e.g. an HTML maintenance page with status 200; its content is not echoed.
+            raise MoodleError(function, "invalid_response", "response is not JSON") from None
         if isinstance(result, dict) and "exception" in result:
             raise MoodleError(function, result.get("errorcode", ""), result.get("message", ""))
         return result
@@ -121,15 +125,15 @@ class MoodleClient:
         events: list[Event] = []
         for _ in range(MAX_EVENT_PAGES):
             page = self._call("core_calendar_get_action_events_by_timesort", **params)
-            raw_events = page.get("events", [])
-            events.extend(
+            page_events = [
                 Event.model_validate(event | {"courseid": (event.get("course") or {}).get("id")})
-                for event in raw_events
-            )
-            if len(raw_events) < MAX_EVENTS or events[-1].id == params.get("aftereventid"):
+                for event in page.get("events", [])
+            ]
+            events.extend(page_events)
+            if len(page_events) < MAX_EVENTS or page_events[-1].id == params.get("aftereventid"):
                 return events
             # A full page: there may be more, continue after the last one.
-            params["aftereventid"] = events[-1].id
+            params["aftereventid"] = page_events[-1].id
         log.warning("Stopped paging calendar events after %d pages", MAX_EVENT_PAGES)
         return events
 

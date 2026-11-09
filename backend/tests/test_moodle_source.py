@@ -23,9 +23,15 @@ def test_demo_mode_returns_demo_client_even_without_token() -> None:
     assert isinstance(source, DemoMoodleClient)
 
 
+def test_empty_url_raises() -> None:
+    with pytest.raises(RuntimeError, match="MOODLE_URL"):
+        get_moodle_source(make_settings(moodle_token=SecretStr("test-token")))
+
+
 def test_empty_token_raises() -> None:
+    settings = make_settings(moodle_url="https://moodle.example.invalid")
     with pytest.raises(RuntimeError, match="MOODLE_TOKEN"):
-        get_moodle_source(make_settings(moodle_token=SecretStr("")))
+        get_moodle_source(settings)
 
 
 def test_plain_http_url_raises() -> None:

@@ -15,7 +15,8 @@ class Settings(BaseSettings):
 
     sync_interval_minutes: int = Field(default=60, ge=1)  # 0 would make the worker loop busy
 
-    moodle_url: str = "https://lernraum.th-luebeck.de"
+    # No default: without configuration nothing is ever sent to a real Lernraum.
+    moodle_url: str = ""
     # SecretStr: the token never shows up in repr(), logs or error messages.
     moodle_token: SecretStr = SecretStr("")
     # true = invented sample data instead of the real Lernraum (screenshots, tests, demos).

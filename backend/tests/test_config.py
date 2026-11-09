@@ -36,7 +36,7 @@ def test_moodle_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv(name, raising=False)
     settings = Settings(_env_file=None)  # pyright: ignore[reportCallIssue]
     assert settings.demo_mode is False
-    assert settings.moodle_url.startswith("https://")
+    assert settings.moodle_url == ""  # never a real Lernraum without configuration
     assert settings.moodle_token.get_secret_value() == ""
 
 

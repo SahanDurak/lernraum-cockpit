@@ -344,6 +344,16 @@ def test_http_error_raises_moodle_error_without_request() -> None:
     assert excinfo.value.__suppress_context__
 
 
+def test_non_json_response_raises_moodle_error() -> None:
+    page = httpx2.Response(200, text="<html>Wartungsmodus</html>")
+    http = httpx2.Client(transport=httpx2.MockTransport(lambda _: page))
+    client = MoodleClient(BASE_URL, SecretStr(TOKEN), http=http)
+    with pytest.raises(MoodleError) as excinfo:
+        client.site_info()
+    assert excinfo.value.errorcode == "invalid_response"
+    assert "Wartungsmodus" not in str(excinfo.value)
+
+
 def test_network_error_raises_moodle_error() -> None:
     def fail(request: httpx2.Request) -> httpx2.Response:
         raise httpx2.ConnectError("unreachable", request=request)

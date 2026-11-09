@@ -9,6 +9,8 @@ from app.moodle.schemas import MoodleSource
 def get_moodle_source(settings: Settings) -> MoodleSource:
     if settings.demo_mode:
         return DemoMoodleClient()
+    if not settings.moodle_url:
+        raise RuntimeError("MOODLE_URL is empty. Set it in .env or use DEMO_MODE=true.")
     if not settings.moodle_token.get_secret_value():
         raise RuntimeError("MOODLE_TOKEN is empty. Set it in .env or use DEMO_MODE=true.")
     return MoodleClient(settings.moodle_url, settings.moodle_token)
