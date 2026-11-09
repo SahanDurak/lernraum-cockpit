@@ -32,13 +32,21 @@
 | 09.11.2026 | **Python-Typprüfung mit pyright** (statt mypy) | Editor (LSP-Plugin) und CI prüfen mit demselben Werkzeug – keine abweichenden Ergebnisse |
 | 09.11.2026 | **Immer Feature-Branch + Pull Request**, auch für Doku; Ablauf im Skill `naechste-aufgabe` | Jede Änderung läuft durch CI und Review; nachvollziehbare Historie |
 | 09.11.2026 | **Harness zuerst**: erste Aufgabe in Stufe 1 ist CI, Hooks, Branch Protection und `docs/HARNESS.md`, noch vor dem App-Gerüst | Jeder spätere Schritt läuft dann schon durch dieselben Prüfungen |
+| 09.11.2026 | **Lint/Format: ruff (Python), ESLint + Prettier (TypeScript); Secret-Scan: gitleaks** | Jeweils der verbreitete Standard; ruff ersetzt Linter und Formatter in einem Tool |
+| 09.11.2026 | **Secret-Scan doppelt**: gitleaks als git-`pre-commit`-Hook und in der CI (ganze Historie) | Lokal wird ein Secret gar nicht erst committet; die CI fängt alles ab, was am Hook vorbeikommt |
+| 09.11.2026 | **Branch Protection vorerst lokal**: git-`pre-push`-Hook + Claude-Hook blocken Pushes auf `main` | Im Free-Plan für private Repos nicht verfügbar; echte Branch Protection folgt mit GitHub Pro (Student Pack beantragt) |
+| 09.11.2026 | **Ein Sammel-Check `ci`** statt einzelner Jobs als required check | Required checks bleiben stabil, auch wenn Jobs dazukommen oder übersprungen werden |
+| 09.11.2026 | **Claude-Review nur beim Öffnen / `ready_for_review`**, keine Drafts; erneut per „@claude review“; nur für den Repo-Owner; Limits über `--max-turns`, Timeout, `concurrency` | Spart Pro-Kontingent; nichts läuft endlos |
+| 09.11.2026 | **`@claude` vorerst nur lesend** (`contents: read`): kommentiert und reviewt, ändert keinen Code; `write` erst mit Branch Protection | Ohne Branch Protection könnte der Workflow technisch direkt auf `main` schreiben |
+| 09.11.2026 | **gitleaks immer mit `--redact`** und nur über Git (`gitleaks git`, `--staged`), **nie über den Arbeitsordner** (`gitleaks dir`); `protect.py` erzwingt das | Der Arbeitsordner enthält die echte `.env`; Secrets sollen nie in einer Ausgabe landen |
+| 09.11.2026 | **GitHub Actions auf Commit-SHAs gepinnt**, Updates per Dependabot; gitleaks-Download per Prüfsumme verifiziert | Schutz vor umgehängten Tags und manipulierten Downloads (Supply Chain) |
 
 ## Offen
 
 | Frage | Stand |
 |---|---|
 | KI-Zugang über die TH (API) | Anfrage an Prof. Knuth gestellt; durch die LLM-Schicht kein Blocker mehr |
-| Konkrete Tools für Lint/Secret-Scan (z. B. ruff, ESLint, gitleaks); Typen fest: pyright + tsc | festlegen in der Aufgabe „Harness aufbauen“ |
+| Branch Protection auf GitHub | wartet auf GitHub Pro (Student Developer Pack beantragt); Aufgabe in der Roadmap |
 | CD: wohin und wie deployen | klären mit Stufe 3 (Hosting) |
 | GoodNotes: welches Gerät, welche Cloud für das Auto-Backup? | klären vor Stufe 4 |
 | Datenbank-Migrationen (Alembic) | einführen, sobald sich das Datenmodell stabilisiert |

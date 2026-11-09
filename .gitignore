@@ -2,6 +2,13 @@
 .env
 .env.*
 !.env.example
+*.env
+.envrc
+*.pem
+*.key
+
+# Logs (Moodle sends the token as wstoken= in URLs, which easily ends up in logs)
+*.log
 
 # Heruntergeladene Lernraum-Dateien und lokale Daten
 data/
@@ -14,10 +21,28 @@ __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
 # Node
 node_modules/
 .next/
+dist/
+dev-dist/
+coverage/
+*.tsbuildinfo
+
+# gitleaks downloads and reports
+/gitleaks
+gitleaks_*.tar.gz
+gitleaks_*_checksums.txt
+gitleaks-report*.json
+*.sarif
+
+# Claude Code (personal, not shared)
+.claude/settings.local.json
+CLAUDE.local.md
 
 # Editor / OS
 .vscode/

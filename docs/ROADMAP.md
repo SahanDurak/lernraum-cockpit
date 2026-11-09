@@ -13,12 +13,13 @@ Grundsatz: **Erst ein dünner, kompletter Durchstich, der jeden Tag Zeit spart �
 
 ## Stufe 1 – Aufgaben
 
-- [ ] **Harness aufbauen** (vor dem App-Gerüst):
+- [x] **Harness aufbauen** (vor dem App-Gerüst) – siehe `docs/HARNESS.md`:
   - GitHub Actions: Lint, Typen, Tests, Secret-Scan, Docker-Build (Jobs laufen, sobald `backend/`/`frontend/` existieren)
   - Claude-Review in Pull Requests über das Pro-Abo
   - Claude-Code-Hooks (z. B. Formatieren nach Änderungen, `.env` schützen)
-  - Branch Protection auf `main` (nur per PR, CI muss grün sein)
+  - Branch Protection auf `main`: vorerst lokal (git-`pre-push`- und Claude-Hook), GitHub-seitig siehe nächste Aufgabe
   - `docs/HARNESS.md` mit Diagramm: Subagenten, Skills, Plugins, Hooks, CI, Review-Ablauf
+- [ ] **Branch Protection auf GitHub**, sobald GitHub Pro aktiv ist (Student Developer Pack): Merge nur per PR, required checks `ci` + `secret-scan`, keine Force-Pushes, kein Löschen von `main`; danach `claude.yml` auf `contents: write` umstellen, damit `@claude` Code ändern kann
 - [ ] Projektgerüst: `backend/` (FastAPI, uv) + `frontend/` (React, Vite, TypeScript, Tailwind), Docker Compose (app, worker, db), mehrstufiges Dockerfile, Konfiguration über `.env`
 - [ ] Moodle-Client + Demo-Client mit Beispieldaten
 - [ ] Datenmodell: Kurse, Abschnitte, Dokumente, Abgaben, Termine, Ankündigungen, Sync-Läufe

@@ -1,5 +1,41 @@
 {
   "permissions": {
-    "deny": ["Read(./.env)", "Read(./data/**)", "Read(./downloads/**)"]
+    "deny": [
+      "Read(./**/.env)",
+      "Edit(./**/.env)",
+      "Write(./**/.env)",
+      "Read(./**/.env.local)",
+      "Edit(./**/.env.local)",
+      "Write(./**/.env.local)",
+      "Read(./**/.env.*.local)",
+      "Edit(./**/.env.*.local)",
+      "Write(./**/.env.*.local)",
+      "Read(./**/.env.production)",
+      "Edit(./**/.env.production)",
+      "Write(./**/.env.production)",
+      "Read(./data/**)",
+      "Read(./downloads/**)",
+      "Bash(docker compose config:*)",
+      "Bash(docker-compose config:*)",
+      "Bash(gh pr merge:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Read|Edit|MultiEdit|Write|NotebookEdit|Grep|Glob",
+        "hooks": [
+          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect.py\" || exit 2" }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/format.py\"" }
+        ]
+      }
+    ]
   }
 }
