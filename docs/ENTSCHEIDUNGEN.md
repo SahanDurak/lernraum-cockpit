@@ -44,6 +44,7 @@
 | 09.11.2026 | **`@claude` mit `contents: write`**: darf auf eigene `claude/…`-Branches pushen, `main` schützt das Ruleset; läuft nur auf Issues/PRs, die der Owner selbst angelegt hat (keine fremden Forks) | Seit es Branch Protection gibt, kann der Workflow nicht mehr direkt auf `main` schreiben. Im öffentlichen Repo könnten fremde Issue-Texte oder Fork-Code Claude sonst per Prompt-Injection steuern – mit Schreibrechten und Token |
 | 09.11.2026 | **Claude GitHub App behält „Workflows: read/write“** (geprüft und bewusst akzeptiert) | `@claude` kann damit auch Workflow-Dateien auf eigenen Branches ändern; nach `main` kommt nichts ohne PR, grüne CI und mein Review |
 | 09.11.2026 | **Lokaler `pre-push`-Hook bleibt** zusätzlich zur Branch Protection | Fällt schon vor dem Push auf statt erst als Ablehnung von GitHub; kostet nichts |
+| 09.11.2026 | **Claude-Review darf lesen**: `Read`, `Glob`, `Grep` zusätzlich zu `gh pr view/diff/comment` und Inline-Kommentaren; weiterhin keine Schreib-Tools und keine weiteren Bash-Rechte; `--max-turns` 30 statt 15; Prompt gibt eine sparsame Reihenfolge vor | Der Prompt verlangt `CLAUDE.md` und `docs/` zu lesen – ohne Lese-Tools verbrauchte der Bot alle 15 Runden mit abgelehnten Versuchen und brach ab |
 
 ## Offen
 
