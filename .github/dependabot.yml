@@ -1,4 +1,6 @@
 version: 2
+# Every ecosystem: minor and patch updates in one grouped PR per week;
+# major updates come as single PRs (except the ignored ones below).
 updates:
   # Keep the pinned action SHAs up to date.
   - package-ecosystem: github-actions
@@ -8,6 +10,9 @@ updates:
     # Wait a week before proposing a new release (time to spot compromised releases).
     cooldown:
       default-days: 7
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
 
   - package-ecosystem: uv
     directory: /backend
@@ -15,6 +20,9 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
 
   - package-ecosystem: npm
     directory: /frontend
@@ -22,6 +30,16 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Node major is pinned on purpose (.nvmrc, engines); types follow that major.
+      - dependency-name: "@types/node"
+        update-types: [version-update:semver-major]
+      # TypeScript majors need a deliberate migration.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
 
   # Base images in the Dockerfile (node, python, uv).
   - package-ecosystem: docker
@@ -30,6 +48,13 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # Same Node major as .nvmrc and engines; upgrade all of them together by hand.
+      - dependency-name: node
+        update-types: [version-update:semver-major]
 
   # Images in docker-compose.yml (pgvector).
   - package-ecosystem: docker-compose
@@ -38,3 +63,6 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]

@@ -21,6 +21,21 @@ flowchart TD
     R --> K["Review durch mich → Merge<br/>Branch wird automatisch gelöscht"]
 ```
 
+## Commit- und PR-Texte
+
+Claude übergibt Commit- und PR-Texte **nie inline** (`-m`, `--body`), sondern schreibt sie mit dem Write-Tool in eine Datei unter `.git/` und übergibt die Datei:
+
+```bash
+git commit -F .git/COMMIT_MSG_DRAFT && rm .git/COMMIT_MSG_DRAFT
+gh pr create --title "…" --body-file .git/PR_BODY_DRAFT && rm .git/PR_BODY_DRAFT
+```
+
+So prüft `protect.py` nur den kurzen Befehl, nicht den Text: Ein Text, der `.env` erwähnt, blockt nicht mehr, und der Hook braucht keine Ausnahmen. `.git/` wird nie committet, die Entwürfe landen also nicht im Repo.
+
+- **Entwurf nach Gebrauch löschen:** Das Write-Tool überschreibt eine bestehende Datei nur, wenn sie vorher gelesen wurde. Bleibt ein alter Entwurf liegen, schlägt das nächste Write fehl – und wird das übersehen, nimmt `git commit -F` still die alte Nachricht.
+- **Der PR-Titel bleibt inline** (`--title`) und wird weiter geprüft: ihn ohne den Dateinamen `.env` formulieren.
+- Die Befehle aus dem Repo-Root aufrufen (relativer Pfad).
+
 ## Bausteine
 
 | Ebene | Baustein | Datei | Aufgabe |
@@ -50,6 +65,7 @@ Beide Claude-Workflows reagieren nur auf den Repo-Owner (schützt das Pro-Kontin
 |---|---|---|
 | `detect` | immer | Welche Teile existieren (`backend/pyproject.toml`, `frontend/package.json`, `Dockerfile`) |
 | `backend` | `backend/` existiert | `ruff check`, `ruff format --check`, `pyright`, `pytest` |
+| `hooks` | immer | `pytest .claude/hooks/tests` – der `.env`-Schutz in `protect.py` geht nicht unbemerkt kaputt |
 | `frontend` | `frontend/` existiert | `npm run lint` (ESLint), `npm run format:check` (Prettier), `npm run typecheck` (tsc), `npm test` (Vitest) |
 | `docker` | `Dockerfile` existiert | Image baut (ohne Push) |
 | `secret-scan` | immer | gitleaks über die **ganze** Git-Historie |
@@ -93,7 +109,8 @@ gitleaks-Version und Prüfsumme in `.github/workflows/ci.yml` (`GITLEAKS_VERSION
 
 Die lokalen Hooks sind ein Sicherheitsnetz gegen Versehen, keine Festung:
 
-- `protect.py` prüft Text, keine echte Shell: Dateinamen wie `prod.env` oder Shell-Globs (`cat .en?`) erkennt es nicht. Erwähnt ein Befehl `.env` nur im Text (z. B. Commit-Message), wird er trotzdem geblockt – lieber einmal zu vorsichtig.
+- `protect.py` prüft Text, keine echte Shell: Dateinamen wie `prod.env` oder Shell-Globs (`cat .en?`) erkennt es nicht. Erwähnt ein Befehl `.env` nur im Text (z. B. Commit-Message), wird er trotzdem geblockt – lieber einmal zu vorsichtig. Ausnahmen im Hook gibt es bewusst nicht (ein Bash-Parser im Hook wird nie vollständig); Commit- und PR-Texte laufen stattdessen über Dateien, siehe „Commit- und PR-Texte“.
+- Tests: `uv run --no-project --with pytest pytest .claude/hooks/tests` (in der CI als Job `hooks`).
 - Bei unlesbarer Eingabe blockt `protect.py` (fail-closed); `format.py` blockt nie.
 - `git … --no-verify` umgeht die Git-Hooks. Claude darf das nicht (`protect.py` blockt es), ich selbst könnte es. Endgültig schützen die CI (`secret-scan`), GitHubs Push Protection und die Branch Protection auf GitHub.
 - Der lokale `pre-push`-Hook greift nicht im GitHub-Runner – dort schützt nur das Ruleset `main` vor `claude.yml`. Die Action holt sich per OIDC (`id-token: write`) einen Token der Claude GitHub App; dessen Rechte bestimmt die App-Installation, nicht allein der `permissions:`-Block. Die echte Grenze sind also Ruleset + App-Rechte. Andere Branches und Tags schützt das Ruleset nicht.
