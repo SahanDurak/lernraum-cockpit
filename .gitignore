@@ -1,0 +1,25 @@
+# Zugangsdaten – niemals committen
+.env
+.env.*
+!.env.example
+
+# Heruntergeladene Lernraum-Dateien und lokale Daten
+data/
+downloads/
+*.sqlite
+*.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Node
+node_modules/
+.next/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
